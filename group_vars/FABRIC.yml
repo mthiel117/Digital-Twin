@@ -22,8 +22,8 @@ digital_twin:
   use_default_interfaces_of_digital_twin_platform: true
 
 # Repository helper variable, NOT an AVD schema field. The twin playbook
-# replaces AVD 6.5's hard-coded arista/ceos:latest image after generation.
-_containerlab_image: ceos-latest
+# applies this image after generation (also AVD 6.5's default).
+_containerlab_image: arista/ceos:latest
 
 # Lab account: arista / arista. Hash from the official AVD L2LS example.
 aaa_settings:

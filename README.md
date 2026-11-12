@@ -1,7 +1,7 @@
 # Digital Twin
 
 A four-switch L2 leaf-spine lab using **Arista AVD 6.5.0** and its native
-Containerlab digital twin generator. The cEOS image is **`ceos-latest`**.
+Containerlab digital twin generator. The cEOS image is **`arista/ceos:latest`**.
 
 The repository contains the input model and build playbooks. Dependencies,
 generated artifacts, and containers have not been installed, built, or launched.
@@ -84,7 +84,7 @@ digital_twin:
   fabric: {}
   use_default_interfaces_of_digital_twin_platform: true
 
-_containerlab_image: ceos-latest
+_containerlab_image: arista/ceos:latest
 ```
 
 `digital_twin.fabric: {}` is required by the AVD 6.5 schema for this environment.
@@ -93,7 +93,7 @@ hard-codes `arista/ceos:latest` in its generated topology; the final playbook ta
 replaces it with the selected image on every build. To override for one build:
 
 ```bash
-ansible-playbook build-digital-twin.yml -e '_containerlab_image=ceos-latest'
+ansible-playbook build-digital-twin.yml -e '_containerlab_image=arista/ceos:latest'
 ```
 
 Expected outputs:
@@ -119,20 +119,20 @@ and `documentation/`, separate from the digital twin artifacts.
 
 ## 3. Prepare the cEOS image on the Linux host
 
-If `ceos-latest` is already present in Docker, skip the import:
+If `arista/ceos:latest` is already present in Docker, skip the import:
 
 ```bash
-sudo docker image inspect ceos-latest
+sudo docker image inspect arista/ceos:latest
 ```
 
 Otherwise, obtain your cEOS-lab archive from Arista and import it using the
 correct path to your downloaded archive:
 
 ```bash
-sudo docker import /path/to/cEOS-lab.tar.xz ceos-latest
+sudo docker import /path/to/cEOS-lab.tar.xz arista/ceos:latest
 ```
 
-Here `ceos-latest` is the Docker image name, equivalent to `ceos-latest:latest`.
+Here `arista/ceos` is the Docker image repository and `latest` is its tag.
 If your image is instead named `ceos:latest`, set `_containerlab_image` to that
 exact name in `group_vars/FABRIC.yml` and rerun `make twin`.
 
