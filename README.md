@@ -53,23 +53,7 @@ network; choose another management subnet if `172.30.30.0/24` overlaps your host
 AVD 6.5's Containerlab feature is PREVIEW and uses the fixed Docker management
 network name `custom_mgmt`; use one generated twin at a time on the host.
 
-## 1. Open the dev container
-
-Run commands from the repository root, keeping the directory name quoted:
-
-```bash
-ansible-galaxy collection list arista.avd
-python3 -c 'import pyavd; print(pyavd.__version__)'
-```
-
-Both should report 6.5.0. If the container already supplies the dependencies,
-continue directly to `make twin`. If dependencies are missing, `make setup`
-installs Python dependencies into the container's current Python environment
-and collections into `./collections`. No virtual environment is created.
-The Ansible configuration also retains access to collections installed in the
-container's standard locations.
-
-## 2. Generate the digital twin
+## 1. Generate the digital twin
 
 ```bash
 make twin
@@ -117,7 +101,7 @@ The generated interface mapping translates Linux `ethN` into EOS `EthernetN`.
 Optional: run `make build` to produce regular configurations under `intended/`
 and `documentation/`, separate from the digital twin artifacts.
 
-## 3. Prepare the cEOS image on the Linux host
+## 2. Prepare the cEOS image on the Linux host
 
 If `arista/ceos:latest` is already present in Docker, skip the import:
 
@@ -141,7 +125,7 @@ If you built in a dev container on your Mac, copy the entire generated
 needs Docker, Containerlab, and the cEOS image. Rebuilding on another host needs
 the same AVD 6.5 dependencies or dev container.
 
-## 4. Launch and access the lab
+## 3. Launch and access the lab
 
 On the Linux host, from the repository root:
 
