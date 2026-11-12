@@ -19,6 +19,12 @@ topology:
     leaf2:
       mgmt-ipv4: 172.30.30.22
       startup-config: intended/configs/leaf2.cfg
+    leaf3:
+      mgmt-ipv4: 172.30.30.23
+      startup-config: intended/configs/leaf3.cfg
+    leaf4:
+      mgmt-ipv4: 172.30.30.24
+      startup-config: intended/configs/leaf4.cfg
     spine1:
       mgmt-ipv4: 172.30.30.11
       startup-config: intended/configs/spine1.cfg
@@ -33,14 +39,38 @@ topology:
     - leaf1:eth2
     - spine2:eth1
   - endpoints:
+    - leaf1:eth3
+    - leaf2:eth3
+  - endpoints:
+    - leaf1:eth4
+    - leaf2:eth4
+  - endpoints:
     - leaf2:eth1
     - spine1:eth2
   - endpoints:
     - leaf2:eth2
     - spine2:eth2
   - endpoints:
+    - leaf3:eth1
     - spine1:eth3
+  - endpoints:
+    - leaf3:eth2
     - spine2:eth3
   - endpoints:
+    - leaf3:eth3
+    - leaf4:eth3
+  - endpoints:
+    - leaf3:eth4
+    - leaf4:eth4
+  - endpoints:
+    - leaf4:eth1
     - spine1:eth4
+  - endpoints:
+    - leaf4:eth2
     - spine2:eth4
+  - endpoints:
+    - spine1:eth5
+    - spine2:eth5
+  - endpoints:
+    - spine1:eth6
+    - spine2:eth6

@@ -245,9 +245,11 @@ vlan 4094
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | Channel-Group |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
 | Ethernet1 | L2_leaf1_Ethernet2 | *trunk | *10,20 | *- | *- | 1 |
-| Ethernet2 | L2_leaf2_Ethernet2 | *trunk | *10,20 | *- | *- | 2 |
-| Ethernet3 | MLAG_spine1_Ethernet3 | *trunk | *- | *- | *MLAG | 1000 |
-| Ethernet4 | MLAG_spine1_Ethernet4 | *trunk | *- | *- | *MLAG | 1000 |
+| Ethernet2 | L2_leaf2_Ethernet2 | *trunk | *10,20 | *- | *- | 1 |
+| Ethernet3 | L2_leaf3_Ethernet2 | *trunk | *10,20 | *- | *- | 3 |
+| Ethernet4 | L2_leaf4_Ethernet2 | *trunk | *10,20 | *- | *- | 3 |
+| Ethernet5 | MLAG_spine1_Ethernet5 | *trunk | *- | *- | *MLAG | 1000 |
+| Ethernet6 | MLAG_spine1_Ethernet6 | *trunk | *- | *- | *MLAG | 1000 |
 
 *Inherited from Port-Channel Interface
 
@@ -263,15 +265,25 @@ interface Ethernet1
 interface Ethernet2
    description L2_leaf2_Ethernet2
    no shutdown
-   channel-group 2 mode active
+   channel-group 1 mode active
 !
 interface Ethernet3
-   description MLAG_spine1_Ethernet3
+   description L2_leaf3_Ethernet2
+   no shutdown
+   channel-group 3 mode active
+!
+interface Ethernet4
+   description L2_leaf4_Ethernet2
+   no shutdown
+   channel-group 3 mode active
+!
+interface Ethernet5
+   description MLAG_spine1_Ethernet5
    no shutdown
    channel-group 1000 mode active
 !
-interface Ethernet4
-   description MLAG_spine1_Ethernet4
+interface Ethernet6
+   description MLAG_spine1_Ethernet6
    no shutdown
    channel-group 1000 mode active
 ```
@@ -284,8 +296,8 @@ interface Ethernet4
 
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | --------------------- | ------------------ | ------- | -------- |
-| Port-Channel1 | L2_leaf1_Port-Channel1 | trunk | 10,20 | - | - | - | - | 1 | - |
-| Port-Channel2 | L2_leaf2_Port-Channel1 | trunk | 10,20 | - | - | - | - | 2 | - |
+| Port-Channel1 | L2_LEAF_PAIR_1_Port-Channel1 | trunk | 10,20 | - | - | - | - | 1 | - |
+| Port-Channel3 | L2_LEAF_PAIR_2_Port-Channel1 | trunk | 10,20 | - | - | - | - | 3 | - |
 | Port-Channel1000 | MLAG_spine1_Port-Channel1000 | trunk | - | - | MLAG | - | - | - | - |
 
 #### Port-Channel Interfaces Device Configuration
@@ -293,20 +305,20 @@ interface Ethernet4
 ```eos
 !
 interface Port-Channel1
-   description L2_leaf1_Port-Channel1
+   description L2_LEAF_PAIR_1_Port-Channel1
    no shutdown
    switchport trunk allowed vlan 10,20
    switchport mode trunk
    switchport
    mlag 1
 !
-interface Port-Channel2
-   description L2_leaf2_Port-Channel1
+interface Port-Channel3
+   description L2_LEAF_PAIR_2_Port-Channel1
    no shutdown
    switchport trunk allowed vlan 10,20
    switchport mode trunk
    switchport
-   mlag 2
+   mlag 3
 !
 interface Port-Channel1000
    description MLAG_spine1_Port-Channel1000

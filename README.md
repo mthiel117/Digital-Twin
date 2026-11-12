@@ -1,25 +1,43 @@
 # Digital Twin
 
-A four-switch L2 leaf-spine lab using **Arista AVD 6.5.0** and its native
+A six-switch L2 leaf-spine lab using **Arista AVD 6.5.0** and its native
 Containerlab digital twin generator. The cEOS image is **`arista/ceos:latest`**.
 
-The repository contains the input model and build playbooks. Dependencies,
-generated artifacts, and containers have not been installed, built, or launched.
+To add this workflow to another AVD repository, use the standalone
+[digital twin reuse guide](DIGITAL-TWIN-REUSE.md), which includes the required
+variable overlay, playbook, Makefile targets, and deployment steps.
+
+The repository contains the input model and build playbooks. After this topology
+change, regenerate the existing four-switch artifacts with `make build` and
+`make twin`. The steps below build the six-switch version; no playbooks or
+containers were run as part of this update.
 
 ## Topology
 
 ```mermaid
 flowchart TB
-    S1[spine1 · 172.30.30.11] <-->|"Et3 + Et4 · MLAG peer link"| S2[spine2 · 172.30.30.12]
+    S1[spine1 · 172.30.30.11] <-->|"Et5 + Et6 · MLAG peer link"| S2[spine2 · 172.30.30.12]
     S1 ---|"Et1 ↔ Et1"| L1[leaf1 · 172.30.30.21]
     S2 ---|"Et1 ↔ Et2"| L1
     S1 ---|"Et2 ↔ Et1"| L2[leaf2 · 172.30.30.22]
     S2 ---|"Et2 ↔ Et2"| L2
+    S1 ---|"Et3 ↔ Et1"| L3[leaf3 · 172.30.30.23]
+    S2 ---|"Et3 ↔ Et2"| L3
+    S1 ---|"Et4 ↔ Et1"| L4[leaf4 · 172.30.30.24]
+    S2 ---|"Et4 ↔ Et2"| L4
+    L1 <-->|"Et3 + Et4 · MLAG peer link"| L2
+    L3 <-->|"Et3 + Et4 · MLAG peer link"| L4
 ```
 
-- Two L2 spines form one MLAG pair. Ethernet3 and Ethernet4 form peer-link
+- Two L2 spines form `SPINE_PAIR`. Ethernet5 and Ethernet6 form peer-link
   Port-Channel1000, with a peer IP pool of `10.255.255.0/30`.
-- Each standalone L2 leaf has one LACP port-channel across both spines.
+- `leaf1` and `leaf2` form `LEAF_PAIR_1`; `leaf3` and `leaf4` form
+  `LEAF_PAIR_2`. Each leaf pair uses Ethernet3 and Ethernet4 for its own
+  Port-Channel1000 peer link. Leaf MLAG control addresses are allocated from
+  `10.255.254.0/24`, separate from the spine pool.
+- Each leaf has Ethernet1 and Ethernet2 bundled toward the spine pair. The
+  uplinks form one back-to-back MLAG port-channel per leaf pair: four physical
+  links connect `LEAF_PAIR_1` to the spines, and four connect `LEAF_PAIR_2`.
 - VLAN 10 (`USERS`) and VLAN 20 (`SERVERS`) are carried across the fabric.
 - MSTP priorities are 4096 on the spines and 16384 on the leaves.
 - Management1 uses the MGMT VRF and subnet `172.30.30.0/24`, gateway `.1`.
@@ -32,8 +50,20 @@ flowchart TB
 | Leaf 1 uplink B | leaf1 Ethernet2 | spine2 Ethernet1 |
 | Leaf 2 uplink A | leaf2 Ethernet1 | spine1 Ethernet2 |
 | Leaf 2 uplink B | leaf2 Ethernet2 | spine2 Ethernet2 |
-| MLAG peer link A | spine1 Ethernet3 | spine2 Ethernet3 |
-| MLAG peer link B | spine1 Ethernet4 | spine2 Ethernet4 |
+| Leaf 3 uplink A | leaf3 Ethernet1 | spine1 Ethernet3 |
+| Leaf 3 uplink B | leaf3 Ethernet2 | spine2 Ethernet3 |
+| Leaf 4 uplink A | leaf4 Ethernet1 | spine1 Ethernet4 |
+| Leaf 4 uplink B | leaf4 Ethernet2 | spine2 Ethernet4 |
+| Spine peer link A | spine1 Ethernet5 | spine2 Ethernet5 |
+| Spine peer link B | spine1 Ethernet6 | spine2 Ethernet6 |
+| Leaf pair 1 peer link A | leaf1 Ethernet3 | leaf2 Ethernet3 |
+| Leaf pair 1 peer link B | leaf1 Ethernet4 | leaf2 Ethernet4 |
+| Leaf pair 2 peer link A | leaf3 Ethernet3 | leaf4 Ethernet3 |
+| Leaf pair 2 peer link B | leaf3 Ethernet4 | leaf4 Ethernet4 |
+
+There are **six nodes and fourteen physical links** in the generated twin.
+Port numbers are local to each device; spine Ethernet3–4 are downlinks, while
+leaf Ethernet3–4 are peer links.
 
 ## Prerequisites
 
@@ -87,8 +117,8 @@ digital_twin/
 ├── DIGITAL_TWIN-topology.clab.yml
 ├── interface_mapping.json
 ├── intended/
-│   ├── configs/              # Four EOS startup configurations
-│   └── structured_configs/   # Four per-device YAML configurations
+│   ├── configs/              # Six EOS startup configurations
+│   └── structured_configs/   # Six per-device YAML configurations
 └── documentation/
     ├── devices/
     └── fabric/
@@ -97,6 +127,10 @@ digital_twin/
 Keep the generated directory layout intact: the topology references
 `intended/configs/<hostname>.cfg` and `interface_mapping.json` relative to itself.
 The generated interface mapping translates Linux `ethN` into EOS `EthernetN`.
+The build discovers all six nodes and all fourteen links from the AVD model;
+there is no separate hand-maintained Containerlab wiring file. Regeneration
+adds leaf3/leaf4, moves the spine peer links to eth5/eth6, and adds both leaf
+peer links and the corresponding startup configurations.
 
 Optional: run `make build` to produce regular configurations under `intended/`
 and `documentation/`, separate from the digital twin artifacts.
@@ -155,7 +189,7 @@ through the Linux host or provide routing to its Docker management network.
 Allow the switches to finish booting. cEOS MLAG defaults include a 300-second
 reload delay, so forwarding can take several minutes to settle.
 
-## 5. Check the fabric
+## 4. Check the fabric
 
 On each spine:
 
@@ -169,12 +203,14 @@ show spanning-tree
 ```
 
 Expect the MLAG peer to become active and the peer link to come up. Each spine
-should discover both leaves and the other spine. MLAG client port-channels
+should discover all four leaves and the other spine. MLAG client port-channels
 should become active once the leaves boot and LACP converges.
 
 On each leaf:
 
 ```text
+show mlag
+show mlag interfaces
 show port-channel summary
 show interfaces trunk
 show lldp neighbors
@@ -183,29 +219,39 @@ show spanning-tree
 ```
 
 Expect both uplinks to bundle into the same port-channel, both spines in LLDP,
-and VLANs 10 and 20 allowed on the trunk. The generated device documentation
-lists the actual port-channel numbers and interface configuration.
+the paired leaf in LLDP, and VLANs 10 and 20 allowed on the trunk. On all six
+switches, `show mlag` should report the configured peer and an active peer link
+after convergence. Each leaf should peer only with its own pair partner.
+The generated device documentation lists the actual port-channel numbers and
+interface configuration.
 
 These checks establish fabric adjacency and L2 control-plane state. End-to-end
-user traffic needs attached test endpoints, which this four-switch lab does
+user traffic needs attached test endpoints, which this six-switch lab does
 not include. Management reachability alone does not test VLAN forwarding.
 
-## 6. Change or stop the lab
+## 5. Change or stop the lab
 
 Edit `group_vars/FABRIC.yml` for VLANs, credentials, and the image;
-`group_vars/SPINES.yml` for the MLAG pair; and `group_vars/LEAVES.yml` for leaves
-and uplinks. When changing management addresses, update both the node `mgmt_ip`
+`group_vars/SPINES.yml` for the spine MLAG pair; and `group_vars/LEAVES.yml` for
+the two leaf MLAG pairs and uplinks. When changing management addresses, update both the node `mgmt_ip`
 and inventory `ansible_host`, plus `mgmt_gateway` if changing the subnet.
-All four management addresses must stay in a single IPv4 subnet.
+All six management addresses must stay in a single IPv4 subnet.
 
 To apply a changed model, destroy the running lab first, regenerate the files,
 and deploy it again:
 
 ```bash
 make destroy
+make build
 make twin
 make deploy
 ```
+
+For the first migration from the four-switch lab, destroy the old deployment
+before rebuilding so Containerlab can remove it using the old topology.
+`make build` refreshes the regular artifacts, and `make twin` refreshes the
+Containerlab topology, interface mapping, startup configs, and generated docs.
+Do not deploy the old four-switch generated files after changing the model.
 
 `make destroy` removes the containers and Containerlab runtime directory.
 Keep desired changes in the YAML model: startup configs are enforced on deploy,
@@ -215,13 +261,13 @@ and rebuilding overwrites generated files.
 
 | File | Purpose |
 | --- | --- |
-| `inventory.yml` | Four switches and their inventory groups |
+| `inventory.yml` | Six switches and their inventory groups |
 | `group_vars/FABRIC.yml` | VLANs, management, credentials, digital twin settings |
 | `group_vars/SPINES.yml` | Spine MLAG pair |
-| `group_vars/LEAVES.yml` | Standalone leaves and aligned uplink mappings |
+| `group_vars/LEAVES.yml` | Two leaf MLAG pairs, peer links, and aligned uplink mappings |
 | `build-digital-twin.yml` | Generate native twin artifacts and select the image |
 | `build.yml` | Generate separate regular artifacts |
-| `requirements.txt`, `requirements.yml` | Version-matched Python and collection dependencies |
+| `.devcontainer/devcontainer.json` | AVD 6.5.0 build environment |
 
 Sources used to prepare the model, all matched to AVD 6.5.0:
 

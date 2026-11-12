@@ -19,6 +19,8 @@
 | --- | ---- | ---- | ------------- | -------- | -------------------------- | ------------- |
 | DIGITAL_TWIN | l2leaf | leaf1 | 172.30.30.21/24 | cEOSLab | Provisioned | - |
 | DIGITAL_TWIN | l2leaf | leaf2 | 172.30.30.22/24 | cEOSLab | Provisioned | - |
+| DIGITAL_TWIN | l2leaf | leaf3 | 172.30.30.23/24 | cEOSLab | Provisioned | - |
+| DIGITAL_TWIN | l2leaf | leaf4 | 172.30.30.24/24 | cEOSLab | Provisioned | - |
 | DIGITAL_TWIN | l2spine | spine1 | 172.30.30.11/24 | cEOSLab | Provisioned | - |
 | DIGITAL_TWIN | l2spine | spine2 | 172.30.30.12/24 | cEOSLab | Provisioned | - |
 
@@ -35,10 +37,18 @@
 | ---- | ---- | -------------- | --------- | --------- | -------------- |
 | l2leaf | leaf1 | Ethernet1 | l2spine | spine1 | Ethernet1 |
 | l2leaf | leaf1 | Ethernet2 | l2spine | spine2 | Ethernet1 |
+| l2leaf | leaf1 | Ethernet3 | mlag_peer | leaf2 | Ethernet3 |
+| l2leaf | leaf1 | Ethernet4 | mlag_peer | leaf2 | Ethernet4 |
 | l2leaf | leaf2 | Ethernet1 | l2spine | spine1 | Ethernet2 |
 | l2leaf | leaf2 | Ethernet2 | l2spine | spine2 | Ethernet2 |
-| l2spine | spine1 | Ethernet3 | mlag_peer | spine2 | Ethernet3 |
-| l2spine | spine1 | Ethernet4 | mlag_peer | spine2 | Ethernet4 |
+| l2leaf | leaf3 | Ethernet1 | l2spine | spine1 | Ethernet3 |
+| l2leaf | leaf3 | Ethernet2 | l2spine | spine2 | Ethernet3 |
+| l2leaf | leaf3 | Ethernet3 | mlag_peer | leaf4 | Ethernet3 |
+| l2leaf | leaf3 | Ethernet4 | mlag_peer | leaf4 | Ethernet4 |
+| l2leaf | leaf4 | Ethernet1 | l2spine | spine1 | Ethernet4 |
+| l2leaf | leaf4 | Ethernet2 | l2spine | spine2 | Ethernet4 |
+| l2spine | spine1 | Ethernet5 | mlag_peer | spine2 | Ethernet5 |
+| l2spine | spine1 | Ethernet6 | mlag_peer | spine2 | Ethernet6 |
 
 ## Fabric IP Allocation
 

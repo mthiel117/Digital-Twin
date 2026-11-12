@@ -7,7 +7,8 @@ l2spine:
     spanning_tree_mode: mstp
     spanning_tree_priority: 4096
     mlag_peer_ipv4_pool: 10.255.255.0/30
-    mlag_interfaces: [Ethernet3, Ethernet4]
+    # Ethernet1-4 connect to the four leaves.
+    mlag_interfaces: [Ethernet5, Ethernet6]
     mlag_port_channel_id: 1000
   node_groups:
     - group: SPINE_PAIR

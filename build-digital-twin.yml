@@ -1,5 +1,5 @@
 ---
-- name: Build the Containerlab L2LS digital twin
+- name: Build the six-switch Containerlab L2LS digital twin
   hosts: FABRIC
   connection: local
   gather_facts: false

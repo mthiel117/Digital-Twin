@@ -4,19 +4,34 @@ type: l2leaf
 l2leaf:
   defaults:
     platform: cEOSLab
-    # Each leaf is standalone; the two spines form its upstream MLAG pair.
-    mlag: false
+    mlag: true
+    # Shared pool is large enough for both MLAG pairs' node IDs.
+    mlag_peer_ipv4_pool: 10.255.254.0/24
+    mlag_interfaces: [Ethernet3, Ethernet4]
+    mlag_port_channel_id: 1000
     spanning_tree_mode: mstp
     spanning_tree_priority: 16384
     uplink_switches: [spine1, spine2]
     uplink_interfaces: [Ethernet1, Ethernet2]
-  nodes:
-    - name: leaf1
-      id: 1
-      mgmt_ip: 172.30.30.21/24
-      # Position matches uplink_switches and uplink_interfaces above.
-      uplink_switch_interfaces: [Ethernet1, Ethernet1]
-    - name: leaf2
-      id: 2
-      mgmt_ip: 172.30.30.22/24
-      uplink_switch_interfaces: [Ethernet2, Ethernet2]
+  node_groups:
+    - group: LEAF_PAIR_1
+      nodes:
+        - name: leaf1
+          id: 1
+          mgmt_ip: 172.30.30.21/24
+          # Position matches uplink_switches and uplink_interfaces above.
+          uplink_switch_interfaces: [Ethernet1, Ethernet1]
+        - name: leaf2
+          id: 2
+          mgmt_ip: 172.30.30.22/24
+          uplink_switch_interfaces: [Ethernet2, Ethernet2]
+    - group: LEAF_PAIR_2
+      nodes:
+        - name: leaf3
+          id: 3
+          mgmt_ip: 172.30.30.23/24
+          uplink_switch_interfaces: [Ethernet3, Ethernet3]
+        - name: leaf4
+          id: 4
+          mgmt_ip: 172.30.30.24/24
+          uplink_switch_interfaces: [Ethernet4, Ethernet4]
