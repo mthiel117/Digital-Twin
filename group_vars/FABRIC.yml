@@ -25,13 +25,20 @@ digital_twin:
 # applies this image after generation (also AVD 6.5's default).
 _containerlab_image: arista/ceos:latest
 
-# Lab account: arista / arista. Hash from the official AVD L2LS example.
+# Default lab login and Ansible credentials: admin with no password.
+ansible_user: admin
+ansible_password: ""
+
 aaa_settings:
   local_users:
-    - name: arista
+    - name: admin
       privilege: 15
       role: network-admin
-      sha512_password: "$6$Enl0WfE32FthwyiJ$yTyGaEJ2uPKLU.F7314YtB7J1jrzrMi7ogXIRTEHQfLdLgKWWmr1UvNlZLN6AyuxET7G5aH3AI9OYRzxVTkB1."
+      no_password: true
+  authentication:
+    policies:
+      local:
+        allow_nopassword: true
   authorization:
     exec:
       default: local

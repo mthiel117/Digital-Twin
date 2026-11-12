@@ -47,8 +47,8 @@ image compatible with the host architecture. On macOS, you can generate the
 files locally, then copy the repository to a Linux VM or server for deployment.
 Native macOS deployment is not the workflow described here.
 
-The lab credentials are **`arista` / `arista`**, with privilege 15. The model
-includes the password hash used by the official AVD example. Use an isolated lab
+The lab login is **`admin` with no password**, with privilege 15. The model
+allows passwordless local authentication. Use an isolated lab
 network; choose another management subnet if `172.30.30.0/24` overlaps your host.
 AVD 6.5's Containerlab feature is PREVIEW and uses the fixed Docker management
 network name `custom_mgmt`; use one generated twin at a time on the host.
@@ -162,10 +162,10 @@ hostnames. Open a console or connect over the host's management bridge:
 ```bash
 sudo docker exec -it spine1 Cli
 sudo docker exec -it leaf1 Cli
-ssh arista@172.30.30.11
+ssh admin@172.30.30.11
 ```
 
-The SSH password is `arista`. If accessing from another computer, use a console
+No login password is configured. If accessing from another computer, use a console
 through the Linux host or provide routing to its Docker management network.
 
 Allow the switches to finish booting. cEOS MLAG defaults include a 300-second
