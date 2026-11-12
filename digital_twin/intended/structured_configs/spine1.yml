@@ -1,3 +1,7 @@
+aaa_authentication:
+  policies:
+    local:
+      allow_nopassword: true
 aaa_authorization:
   exec:
     default: local
@@ -51,10 +55,10 @@ hostname: spine1
 ip_igmp_snooping:
   globally_enabled: true
 local_users:
-- name: arista
+- name: admin
   privilege: 15
   role: network-admin
-  sha512_password: $6$Enl0WfE32FthwyiJ$yTyGaEJ2uPKLU.F7314YtB7J1jrzrMi7ogXIRTEHQfLdLgKWWmr1UvNlZLN6AyuxET7G5aH3AI9OYRzxVTkB1.
+  no_password: true
 management_api_http:
   enable_https: true
   enable_vrfs:
