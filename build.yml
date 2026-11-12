@@ -1,0 +1,18 @@
+---
+- name: Build regular L2LS configurations and documentation
+  hosts: FABRIC
+  connection: local
+  gather_facts: false
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+    avd_digital_twin_mode: false
+    output_dir_name: intended
+    documentation_dir_name: documentation
+  tasks:
+    - name: Generate structured configurations and fabric documentation
+      ansible.builtin.import_role:
+        name: arista.avd.eos_designs
+
+    - name: Generate EOS configurations and device documentation
+      ansible.builtin.import_role:
+        name: arista.avd.eos_cli_config_gen

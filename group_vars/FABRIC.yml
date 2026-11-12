@@ -1,0 +1,46 @@
+---
+fabric_name: DIGITAL_TWIN
+
+# Both regular and twin builds use cEOS-compatible interface names.
+mgmt_interface_settings:
+  interface: Management1
+  vrf: MGMT
+mgmt_gateway: 172.30.30.1
+
+management_eapi:
+  enabled: true
+
+eos_designs_documentation:
+  topology_csv: true
+  p2p_links_csv: true
+
+# Native AVD 6.5 digital twin inputs. The twin playbook enables the mode.
+# fabric: {} is required by the 6.5 schema even for Containerlab.
+digital_twin:
+  environment: containerlab
+  fabric: {}
+  use_default_interfaces_of_digital_twin_platform: true
+
+# Repository helper variable, NOT an AVD schema field. The twin playbook
+# replaces AVD 6.5's hard-coded arista/ceos:latest image after generation.
+_containerlab_image: ceos-latest
+
+# Lab account: arista / arista. Hash from the official AVD L2LS example.
+aaa_settings:
+  local_users:
+    - name: arista
+      privilege: 15
+      role: network-admin
+      sha512_password: "$6$Enl0WfE32FthwyiJ$yTyGaEJ2uPKLU.F7314YtB7J1jrzrMi7ogXIRTEHQfLdLgKWWmr1UvNlZLN6AyuxET7G5aH3AI9OYRzxVTkB1."
+  authorization:
+    exec:
+      default: local
+
+# Shared L2 services. No VXLAN, EVPN, BGP, or tenant routing is needed.
+tenants:
+  - name: LAB
+    l2vlans:
+      - id: 10
+        name: USERS
+      - id: 20
+        name: SERVERS

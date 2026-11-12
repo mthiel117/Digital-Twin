@@ -1,0 +1,4 @@
+# Keep PyAVD and the arista.avd collection on the same release.
+pyavd[ansible]==6.5.0
+# Python 3.13 requires Ansible 2.19 or later; keep within AVD 6.5's range.
+ansible-core>=2.19,<2.22

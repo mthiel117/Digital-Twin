@@ -1,0 +1,12 @@
+.venv/
+collections/
+.ansible/
+__pycache__/
+*.retry
+.DS_Store
+clab-*/
+digital_twin/clab-*/
+digital_twin/.clab-*/
+digital_twin/*.bak
+digital_twin/*-topology.clab.yml
+digital_twin/interface_mapping.json

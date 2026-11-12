@@ -1,0 +1,17 @@
+---
+FABRIC:
+  children:
+    DIGITAL_TWIN:
+      children:
+        SPINES:
+          hosts:
+            spine1:
+              ansible_host: 172.30.30.11
+            spine2:
+              ansible_host: 172.30.30.12
+        LEAVES:
+          hosts:
+            leaf1:
+              ansible_host: 172.30.30.21
+            leaf2:
+              ansible_host: 172.30.30.22

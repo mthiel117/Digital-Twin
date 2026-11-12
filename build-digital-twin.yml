@@ -1,0 +1,37 @@
+---
+- name: Build the Containerlab L2LS digital twin
+  hosts: FABRIC
+  connection: local
+  gather_facts: false
+  vars:
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+    avd_digital_twin_mode: true
+    # AVD's generated startup-config paths require this layout.
+    output_dir_name: digital_twin/intended
+    documentation_dir_name: digital_twin/documentation
+    _containerlab_topology_file: "{{ inventory_dir }}/digital_twin/{{ fabric_name }}-topology.clab.yml"
+  tasks:
+    - name: Generate structured configurations and Containerlab topology
+      ansible.builtin.import_role:
+        name: arista.avd.eos_designs
+
+    - name: Generate EOS startup configurations and device documentation
+      ansible.builtin.import_role:
+        name: arista.avd.eos_cli_config_gen
+
+    - name: Apply the selected cEOS image to the generated topology
+      ansible.builtin.copy:
+        dest: "{{ _containerlab_topology_file }}"
+        mode: "0644"
+        content: >-
+          {{
+            lookup('ansible.builtin.file', _containerlab_topology_file)
+            | from_yaml
+            | combine(
+                {'topology': {'kinds': {'arista_ceos': {'image': _containerlab_image}}}},
+                recursive=true
+              )
+            | to_nice_yaml(indent=2, sort_keys=false)
+          }}
+      delegate_to: localhost
+      run_once: true
