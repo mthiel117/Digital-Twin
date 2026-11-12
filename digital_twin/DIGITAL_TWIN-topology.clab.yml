@@ -1,0 +1,46 @@
+name: DIGITAL_TWIN
+prefix: ''
+mgmt:
+  network: custom_mgmt
+  ipv4-subnet: 172.30.30.0/24
+topology:
+  defaults:
+    kind: arista_ceos
+  kinds:
+    arista_ceos:
+      enforce-startup-config: true
+      image: arista/ceos:latest
+      binds:
+      - interface_mapping.json:/mnt/flash/EosIntfMapping.json:ro
+  nodes:
+    leaf1:
+      mgmt-ipv4: 172.30.30.21
+      startup-config: intended/configs/leaf1.cfg
+    leaf2:
+      mgmt-ipv4: 172.30.30.22
+      startup-config: intended/configs/leaf2.cfg
+    spine1:
+      mgmt-ipv4: 172.30.30.11
+      startup-config: intended/configs/spine1.cfg
+    spine2:
+      mgmt-ipv4: 172.30.30.12
+      startup-config: intended/configs/spine2.cfg
+  links:
+  - endpoints:
+    - leaf1:eth1
+    - spine1:eth1
+  - endpoints:
+    - leaf1:eth2
+    - spine2:eth1
+  - endpoints:
+    - leaf2:eth1
+    - spine1:eth2
+  - endpoints:
+    - leaf2:eth2
+    - spine2:eth2
+  - endpoints:
+    - spine1:eth3
+    - spine2:eth3
+  - endpoints:
+    - spine1:eth4
+    - spine2:eth4
